@@ -6,9 +6,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-# Tracking MLflow lokal
-mlflow.set_tracking_uri("file:./mlruns")
-
 # Load dataset preprocessing
 df = pd.read_csv("obesity_preprocessing.csv")
 
@@ -24,10 +21,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-# MLflow autolog
 mlflow.sklearn.autolog()
 
-with mlflow.start_run():
+with mlflow.start_run(nested=True):
 
     model = RandomForestClassifier(
         n_estimators=100,
@@ -39,5 +35,7 @@ with mlflow.start_run():
     y_pred = model.predict(X_test)
 
     accuracy = accuracy_score(y_test, y_pred)
+
+    mlflow.log_metric("accuracy", accuracy)
 
     print(f"Accuracy : {accuracy:.4f}")
